@@ -83,7 +83,9 @@
       --ink: #e8e6df;
       --ink-dim: #a9a7b5;
     }
-    .reveal { background: var(--navy-bg); }
+    .reveal {
+      background: radial-gradient(ellipse at top left, var(--navy-bg-alt) 0%, var(--navy-bg) 45%, #080d1f 100%);
+    }
     .reveal .slides section { text-align: left; }
     .reveal .slides section.center { text-align: center; }
     .reveal h1, .reveal h2, .reveal h3 { color: var(--maroon-bright); text-shadow: none; }
