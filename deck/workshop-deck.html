@@ -157,14 +157,15 @@
       background: var(--navy-bg-alt); border: 1px solid #2a3358;
       color: var(--ink);
     }
-    .quiz-options li.quiz-answer-row {
+    .quiz-options li.fragment {
       opacity: 1 !important; visibility: visible !important;
     }
-    .quiz-options li.quiz-answer-row.visible {
-      border-color: #4ade80; background: rgba(74, 222, 128, 0.08);
+    .quiz-options li.fragment.visible.quiz-correct {
+      border-color: #4ade80; background: rgba(74, 222, 128, 0.12);
     }
-    .quiz-check {
-      display: inline-block; margin-left: 8px; color: #4ade80; font-weight: bold;
+    .quiz-options li.fragment.visible.quiz-wrong {
+      border-color: #f87171; background: rgba(248, 113, 113, 0.06);
+      text-decoration: line-through; color: var(--ink-dim);
     }
     .quiz-explain {
       color: var(--maroon-bright); font-style: italic;
@@ -425,10 +426,10 @@ Policy notes:
       <span class="module-tag">Day 1 recap · Quick check</span>
       <h2>An LLM isn't given the facts it needs to answer a question. What does it do?</h2>
       <ul class="quiz-options">
-        <li>A. Refuses to answer</li>
-        <li>B. Says it doesn't have enough information</li>
-        <li class="fragment quiz-answer-row" data-fragment-index="1">C. Confidently invents a plausible-sounding answer<span class="fragment quiz-check" data-fragment-index="1"> ✓ Correct</span></li>
-        <li>D. Automatically escalates to a human</li>
+        <li class="fragment quiz-wrong" data-fragment-index="1">A. Refuses to answer</li>
+        <li class="fragment quiz-wrong" data-fragment-index="1">B. Says it doesn't have enough information</li>
+        <li class="fragment quiz-correct" data-fragment-index="1">C. Confidently invents a plausible-sounding answer</li>
+        <li class="fragment quiz-wrong" data-fragment-index="1">D. Automatically escalates to a human</li>
       </ul>
       <p class="fragment quiz-explain" data-fragment-index="1">That's hallucination — the fix is grounding (Module 2, Lab 1.0).</p>
     </section>
