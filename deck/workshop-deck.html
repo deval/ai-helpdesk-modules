@@ -543,6 +543,19 @@ docker compose up -d</div>
       <p class="fragment"><strong>Deliverable:</strong> working classify → draft → hold-for-review workflow</p>
     </section>
 
+    <!-- Day 2 quiz -->
+    <section>
+      <span class="module-tag">Day 2 recap · Quick check</span>
+      <h2>In Lab 2.3's draft-and-hold pattern, what happens to the AI's drafted reply before a customer ever sees it?</h2>
+      <ul class="quiz-options">
+        <li class="fragment quiz-wrong" data-fragment-index="1">A. It's sent automatically whenever confidence is HIGH</li>
+        <li class="fragment quiz-correct" data-fragment-index="1">B. A human reviews it in the queue and approves or edits it</li>
+        <li class="fragment quiz-wrong" data-fragment-index="1">C. It's discarded and only logged for audits</li>
+        <li class="fragment quiz-wrong" data-fragment-index="1">D. A second AI model reviews and approves it</li>
+      </ul>
+      <p class="fragment quiz-explain" data-fragment-index="1">That's agent-assist — the safest tier from Module 1, kept in place through all of Day 2.</p>
+    </section>
+
     <!-- ============ DAY 3 DIVIDER ============ -->
     <section class="center day-divider">
       <svg class="day-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z" /><path d="m9 12 2 2 4-4" /></svg>
@@ -625,6 +638,19 @@ docker compose up -d</div>
         <li><strong>Co-pilot mode</strong> — human reviews/edits before sending. Runs until numbers are trusted.</li>
         <li><strong>Narrow auto-send</strong> — one low-risk category, tripwires reviewed by policy owner.</li>
       </ol>
+    </section>
+
+    <!-- Day 3 quiz -->
+    <section>
+      <span class="module-tag">Day 3 recap · Quick check</span>
+      <h2>A ticket gets HIGH confidence from the model, but its body contains the word "refund." What does Lab 3.1's guardrail do?</h2>
+      <ul class="quiz-options">
+        <li class="fragment quiz-wrong" data-fragment-index="1">A. Auto-sends it, since confidence is HIGH</li>
+        <li class="fragment quiz-correct" data-fragment-index="1">B. Escalates it to human review despite the high confidence</li>
+        <li class="fragment quiz-wrong" data-fragment-index="1">C. Rejects the ticket and drafts nothing</li>
+        <li class="fragment quiz-wrong" data-fragment-index="1">D. Asks the model to double-check itself</li>
+      </ul>
+      <p class="fragment quiz-explain" data-fragment-index="1">Model confidence is a weak signal on its own — that's the whole point of the OR condition.</p>
     </section>
 
     <!-- Capstone -->
