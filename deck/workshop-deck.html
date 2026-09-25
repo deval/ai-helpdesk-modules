@@ -434,6 +434,30 @@ Policy notes:
       <p class="fragment quiz-explain" data-fragment-index="1">That's hallucination — the fix is grounding (Module 2, Lab 1.0).</p>
     </section>
 
+    <section>
+      <span class="module-tag">Day 1 recap · Quick check 2</span>
+      <h2>Which of the three AI-support tiers does most of this workshop's pipeline live in?</h2>
+      <ul class="quiz-options">
+        <li class="fragment quiz-wrong" data-fragment-index="1">A. Ticket deflection</li>
+        <li class="fragment quiz-correct" data-fragment-index="1">B. Agent-assist</li>
+        <li class="fragment quiz-wrong" data-fragment-index="1">C. Full automation</li>
+        <li class="fragment quiz-wrong" data-fragment-index="1">D. This workshop doesn't classify by tier</li>
+      </ul>
+      <p class="fragment quiz-explain" data-fragment-index="1">Agent-assist is the safest place to start — human approves before anything reaches the customer (Module 1).</p>
+    </section>
+
+    <section>
+      <span class="module-tag">Day 1 recap · Quick check 3</span>
+      <h2>Why does NotebookLM require every answer to cite a source passage?</h2>
+      <ul class="quiz-options">
+        <li class="fragment quiz-wrong" data-fragment-index="1">A. It's a legal requirement for AI products</li>
+        <li class="fragment quiz-correct" data-fragment-index="1">B. So participants can directly verify the answer is actually supported</li>
+        <li class="fragment quiz-wrong" data-fragment-index="1">C. To slow responses down so users read more carefully</li>
+        <li class="fragment quiz-wrong" data-fragment-index="1">D. It's a leftover default unrelated to accuracy</li>
+      </ul>
+      <p class="fragment quiz-explain" data-fragment-index="1">Citation-first design is why NotebookLM works as a grounding teaching tool (Module 3).</p>
+    </section>
+
     <!-- ============ DAY 2 DIVIDER ============ -->
     <section class="center day-divider">
       <svg class="day-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="8" height="8" x="3" y="3" rx="2" /><path d="M7 11v4a2 2 0 0 0 2 2h4" /><rect width="8" height="8" x="13" y="13" rx="2" /></svg>
@@ -556,6 +580,30 @@ docker compose up -d</div>
       <p class="fragment quiz-explain" data-fragment-index="1">That's agent-assist — the safest tier from Module 1, kept in place through all of Day 2.</p>
     </section>
 
+    <section>
+      <span class="module-tag">Day 2 recap · Quick check 2</span>
+      <h2>Why does Lab 2.2 use a raw HTTP Request node instead of a purpose-built Gemini node?</h2>
+      <ul class="quiz-options">
+        <li class="fragment quiz-wrong" data-fragment-index="1">A. The purpose-built node doesn't support JSON output</li>
+        <li class="fragment quiz-correct" data-fragment-index="1">B. It teaches the actual request/response contract, transferable to any other API</li>
+        <li class="fragment quiz-wrong" data-fragment-index="1">C. HTTP Request nodes run faster</li>
+        <li class="fragment quiz-wrong" data-fragment-index="1">D. n8n doesn't have a purpose-built Gemini node</li>
+      </ul>
+      <p class="fragment quiz-explain" data-fragment-index="1">The same request/response pattern transfers to any API you integrate later (Module 7).</p>
+    </section>
+
+    <section>
+      <span class="module-tag">Day 2 recap · Quick check 3</span>
+      <h2>After the HTTP Request node calls Gemini in Lab 2.2, why is a Code node needed next?</h2>
+      <ul class="quiz-options">
+        <li class="fragment quiz-wrong" data-fragment-index="1">A. To retry failed requests automatically</li>
+        <li class="fragment quiz-correct" data-fragment-index="1">B. To parse the JSON string response into real top-level fields</li>
+        <li class="fragment quiz-wrong" data-fragment-index="1">C. To translate the reply into other languages</li>
+        <li class="fragment quiz-wrong" data-fragment-index="1">D. To encrypt the response before storing it</li>
+      </ul>
+      <p class="fragment quiz-explain" data-fragment-index="1">Gemini's response text arrives as a JSON string, not parsed fields — the Code node does that parsing (Lab 2.2).</p>
+    </section>
+
     <!-- ============ DAY 3 DIVIDER ============ -->
     <section class="center day-divider">
       <svg class="day-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z" /><path d="m9 12 2 2 4-4" /></svg>
@@ -651,6 +699,30 @@ docker compose up -d</div>
         <li class="fragment quiz-wrong" data-fragment-index="1">D. Asks the model to double-check itself</li>
       </ul>
       <p class="fragment quiz-explain" data-fragment-index="1">Model confidence is a weak signal on its own — that's the whole point of the OR condition.</p>
+    </section>
+
+    <section>
+      <span class="module-tag">Day 3 recap · Quick check 2</span>
+      <h2>When should a team switch from direct injection to vector retrieval for grounding?</h2>
+      <ul class="quiz-options">
+        <li class="fragment quiz-wrong" data-fragment-index="1">A. Never — direct injection always works better</li>
+        <li class="fragment quiz-correct" data-fragment-index="1">B. When the knowledge base grows too large to paste in full every time</li>
+        <li class="fragment quiz-wrong" data-fragment-index="1">C. Only when using NotebookLM instead of Gemini</li>
+        <li class="fragment quiz-wrong" data-fragment-index="1">D. As soon as more than one document exists</li>
+      </ul>
+      <p class="fragment quiz-explain" data-fragment-index="1">Direct injection is simpler and just as accurate until the file outgrows the reliable-recall budget (Module 9).</p>
+    </section>
+
+    <section>
+      <span class="module-tag">Day 3 recap · Quick check 3</span>
+      <h2>Why should real customer data stay off the Gemini free tier in a production rollout?</h2>
+      <ul class="quiz-options">
+        <li class="fragment quiz-wrong" data-fragment-index="1">A. Free-tier responses are slower</li>
+        <li class="fragment quiz-correct" data-fragment-index="1">B. Free-tier prompts/responses may be used to train Google's models</li>
+        <li class="fragment quiz-wrong" data-fragment-index="1">C. The free tier doesn't support JSON output</li>
+        <li class="fragment quiz-wrong" data-fragment-index="1">D. Free-tier requests aren't logged for debugging</li>
+      </ul>
+      <p class="fragment quiz-explain" data-fragment-index="1">A production rollout uses a paid tier with a no-training-data agreement instead (Module 11).</p>
     </section>
 
     <!-- Capstone -->
