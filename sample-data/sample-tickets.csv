@@ -1,0 +1,6 @@
+id,subject,body,customer_email
+1,Can't log into Coretax,"I can't log into Coretax, it says my NPWP isn't recognized even though I registered last month. What do I do?",ticket1@example.com
+2,Re-registration question,"Do I need to re-register as a taxpayer now that Coretax has replaced the old system, or does my existing data carry over?",ticket2@example.com
+3,e-Faktur submission error,"My e-Faktur won't generate in Coretax — I get an error at the final submit step. Is this a known issue?",ticket3@example.com
+4,PJAP integration compatibility,"I'm a PJAP (tax application provider) — does my integration still work with the new system, or do I need to change anything?",ticket4@example.com
+5,Payment not showing as received,"I made a payment through Coretax but it's not showing as received three days later. Should I pay again or wait?",ticket5@example.com

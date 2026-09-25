@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>AI-Powered Helpdesk & Customer Service Workshop</title>
+  <link rel="stylesheet" href="reveal-dist/reveal.css">
+  <link rel="stylesheet" href="reveal-dist/theme/black.css">
+  <link rel="stylesheet" href="reveal-dist/plugin/menu/menu.css">
+  <style>
+    /* menu.js's hamburger icon needs Font Awesome, which we don't vendor —
+       replace the glyph with a plain unicode character instead. */
+    .slide-menu-button .fas.fa-bars {
+      font-family: inherit !important;
+      font-style: normal;
+    }
+    .slide-menu-button .fas.fa-bars::before {
+      content: "\2630";
+      color: #fff;
+      background: var(--maroon);
+      display: inline-block;
+      width: 36px; height: 36px; line-height: 36px;
+      text-align: center; border-radius: 6px;
+      font-size: 18px;
+    }
+
+    /* Slide-out menu panel — override its default dark-gray look with our navy/maroon theme */
+    .slide-menu {
+      background-color: var(--navy-bg-alt) !important;
+      font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif !important;
+    }
+    .slide-menu-panel {
+      color: var(--ink) !important;
+    }
+    .slide-menu-wrapper .slide-menu-panel h1,
+    .slide-menu-wrapper .slide-menu-panel h2,
+    .slide-menu-wrapper .slide-menu-panel h3,
+    .slide-menu-wrapper .slide-menu-panel h4,
+    .slide-menu-wrapper .slide-menu-panel h5,
+    .slide-menu-wrapper .slide-menu-panel h6 {
+      color: var(--maroon-bright) !important;
+    }
+    .slide-menu-item {
+      border-top: solid 1px #2a3358 !important;
+    }
+    .slide-menu-wrapper .slide-menu-item a {
+      color: var(--ink) !important;
+    }
+    .slide-menu-wrapper .slide-menu-item a:hover {
+      color: #fff !important;
+      background-color: var(--maroon) !important;
+    }
+    .slide-menu-wrapper .active-menu-panel li.selected {
+      background-color: var(--maroon) !important;
+      color: #fff !important;
+    }
+    .slide-menu-wrapper .active-menu-panel li.active {
+      color: var(--maroon-bright) !important;
+    }
+    .slide-menu-wrapper .slide-menu-item-number {
+      color: var(--maroon-bright) !important;
+    }
+    .slide-menu-toolbar {
+      border-bottom: solid 2px var(--maroon) !important;
+    }
+    .slide-menu-wrapper .slide-menu-toolbar > li {
+      color: var(--ink-dim) !important;
+    }
+    .slide-menu-wrapper .slide-menu-toolbar > li.active-toolbar-button {
+      color: #fff !important;
+    }
+    /* Toolbar icons (Close, Slides tab) also need Font Awesome we don't vendor — same fallback approach as the hamburger */
+    .slide-menu-toolbar .fas.fa-times, .slide-menu-toolbar .fas.fa-images {
+      font-family: inherit !important;
+      font-style: normal;
+    }
+    .slide-menu-toolbar .fas.fa-times::before { content: "\2715"; }
+    .slide-menu-toolbar .fas.fa-images::before { content: "\2637"; }
+    :root {
+      --navy-bg: #0b1229;
+      --navy-bg-alt: #121b3d;
+      --maroon: #8c2f39;
+      --maroon-bright: #b8394a;
+      --ink: #e8e6df;
+      --ink-dim: #a9a7b5;
+    }
+    .reveal { background: var(--navy-bg); }
+    .reveal .slides section { text-align: left; }
+    .reveal .slides section.center { text-align: center; }
+    .reveal h1, .reveal h2, .reveal h3 { color: var(--maroon-bright); text-shadow: none; }
+    .reveal h4 { color: #d4a5ac; text-transform: none; }
+    .reveal p, .reveal li { color: var(--ink); }
+    .reveal small, .reveal p small { color: var(--ink-dim); }
+    .reveal em { color: #d4a5ac; }
+    .reveal strong { color: #f2c9ce; }
+    .reveal a { color: #e0a0aa; }
+    .reveal ::selection { background: var(--maroon); color: #fff; }
+    .reveal blockquote {
+      background: var(--navy-bg-alt); border-left: 4px solid var(--maroon-bright);
+      padding: 0.5em 1em; font-style: italic; box-shadow: none; width: auto;
+    }
+
+    .reveal table { font-size: 0.55em; border-collapse: collapse; margin: 0 auto; }
+    .reveal table th { background: var(--maroon); color: #fff; border-color: #3a2530; }
+    .reveal table td { color: var(--ink); border-color: #2a3358; }
+    .reveal table tr { background: var(--navy-bg-alt); }
+
+    .fail { color: #f87171; }
+    .fix { color: #4ade80; }
+    .warn { color: #facc15; }
+
+    .code-box {
+      background: #060a17; color: #cbd5e1; text-align: left;
+      padding: 16px 20px; border-radius: 8px; font-size: 0.42em;
+      font-family: 'Consolas', 'Courier New', monospace; margin: 14px auto;
+      max-width: 850px; white-space: pre-wrap; border: 1px solid var(--maroon);
+    }
+    .output-box {
+      text-align: left; padding: 14px 18px; border-radius: 8px;
+      font-size: 0.5em; margin: 14px auto; max-width: 800px;
+      border-left: 6px solid #666; background: var(--navy-bg-alt);
+    }
+    .output-box.bad { border-left-color: #f87171; }
+    .output-box.bad, .output-box.bad * { color: #fca5a5; }
+    .output-box.good { border-left-color: #4ade80; }
+    .output-box.good, .output-box.good * { color: #86efac; }
+
+    .step-list { font-size: 0.62em; }
+    .step-list li { margin-bottom: 0.4em; }
+
+    .day-divider { text-align: center; }
+    .day-divider .day-label {
+      font-size: 0.5em; letter-spacing: 0.3em; text-transform: uppercase;
+      color: var(--maroon-bright); display: block; margin-bottom: 0.3em;
+    }
+    .module-tag {
+      display: inline-block; font-size: 0.4em; letter-spacing: 0.15em;
+      text-transform: uppercase; color: var(--ink-dim); border: 1px solid var(--maroon);
+      border-radius: 20px; padding: 4px 14px; margin-bottom: 10px;
+    }
+
+    .two-col { display: flex; gap: 30px; text-align: left; }
+    .two-col > div { flex: 1; }
+
+    .badge {
+      display: inline-block; font-size: 0.55em; padding: 3px 10px;
+      border-radius: 4px; margin: 2px; color: #fff;
+    }
+    .badge.deflect { background: #2c5282; }
+    .badge.assist { background: #8c2f39; }
+    .badge.auto { background: #7c2d12; }
+  </style>
+</head>
+<body>
+<div class="reveal">
+  <div class="slides">
+
+    <!-- ============ TITLE ============ -->
+    <section class="center">
+      <h1>AI-Powered Helpdesk<br>& Customer Service Workshop</h1>
+      <h3>3 days · ~6 hours/day · $0 cost — free tiers only</h3>
+      <p><small>Each participant leaves with a working end-to-end AI helpdesk demo and a one-page rollout plan for their own workplace.</small></p>
+    </section>
+
+    <section>
+      <h2>Tool stack (all free)</h2>
+      <table>
+        <tr><th>Tool</th><th>Role</th></tr>
+        <tr><td>Google NotebookLM</td><td>Source-grounded Q&amp;A, knowledge base</td></tr>
+        <tr><td>n8n + Tailscale Funnel</td><td>Self-hosted automation, stable public URL</td></tr>
+        <tr><td>Groq API</td><td>Fast live prompt-tuning demo</td></tr>
+        <tr><td>Gemini API</td><td>Classify + draft replies inside n8n</td></tr>
+        <tr><td>Postgres + Adminer <em>(optional)</em></td><td>Local, credential-free alt. to Sheets</td></tr>
+      </table>
+      <p class="fragment"><small><span class="warn">Free tiers move fast</span> — model IDs and rate limits in this deck were verified 2026-09-23. Re-check before running again.</small></p>
+    </section>
+
+    <section>
+      <h2>What participants should have / do</h2>
+      <ul class="step-list">
+        <li>Laptop with <strong>admin/install rights</strong> — the #1 workshop no-show cause</li>
+        <li>10GB free disk space, stable internet for the first <code>docker compose up</code></li>
+        <li>Comfortable in a terminal — no programming required beyond copy/paste JSON</li>
+        <li>Docker Desktop, Google, Groq, AI Studio, and Tailscale accounts set up beforehand</li>
+      </ul>
+    </section>
+
+    <!-- ============ DAY 1 DIVIDER ============ -->
+    <section class="center day-divider">
+      <span class="day-label">Day 1</span>
+      <h1>Knowledge foundations<br>with NotebookLM</h1>
+      <p>Turn messy internal docs into a queryable, citation-backed knowledge base.</p>
+    </section>
+
+    <!-- Module 1 -->
+    <section>
+      <span class="module-tag">Module 1 · 09:00–10:00</span>
+      <h2>What is an LLM?</h2>
+      <p class="fragment">Not a database — it doesn't "look up" answers.</p>
+      <p class="fragment">A <strong>statistical next-token predictor</strong>, trained on text, predicting the most likely next token.</p>
+      <p class="fragment">No internal fact-checker, no concept of "I don't know this."</p>
+      <p class="fragment"><em>An LLM optimizes for plausible, not true.</em></p>
+    </section>
+
+    <section>
+      <span class="module-tag">Module 1</span>
+      <h2>How this helps a helpdesk</h2>
+      <p>Good at <strong>transforming</strong> text it's already given:</p>
+      <ul class="step-list">
+        <li class="fragment">Drafting a reply in a consistent tone</li>
+        <li class="fragment">Summarizing a long thread</li>
+        <li class="fragment">Classifying a ticket into a category</li>
+        <li class="fragment">Answering when the answer is fully in the text handed to it</li>
+      </ul>
+      <p class="fragment">This is why <strong>grounding</strong> works — you're not asking it to recall, you're asking it to transform what you gave it.</p>
+    </section>
+
+    <section>
+      <span class="module-tag">Module 1</span>
+      <h2>The risk this creates</h2>
+      <p>Asked something outside what it was given, it doesn't default to <em>"I don't have this info."</em></p>
+      <p class="fragment">It keeps predicting plausible text → a <span class="fail">confident, fluent, wrong</span> answer.</p>
+      <p class="fragment">For a helpdesk: a wrong answer delivered <strong>confidently</strong> is harder to catch than one that's obviously uncertain.</p>
+    </section>
+
+    <section>
+      <span class="module-tag">Module 1</span>
+      <h2>Three levels of AI in support</h2>
+      <p><span class="badge deflect">Ticket deflection</span> customer never reaches a human</p>
+      <p class="fragment"><span class="badge assist">Agent-assist</span> AI drafts, human approves — safest place to start</p>
+      <p class="fragment"><span class="badge auto">Full automation</span> AI acts with no human step — narrow, high-confidence only</p>
+      <p class="fragment"><small>Most of this workshop lives in <strong>agent-assist</strong> — the "draft → hold for review" pattern.</small></p>
+    </section>
+
+    <section>
+      <span class="module-tag">Module 1</span>
+      <h2>Reference numbers (approximate)</h2>
+      <p>AI-assisted deflection: commonly reported <strong>20–40%</strong> for well-scoped FAQ categories.</p>
+      <p class="fragment">Agent-assist drafting: reported to cut handle time <strong>10–30%</strong> when agents edit rather than write from scratch.</p>
+      <p class="fragment warn"><small>Treat as sanity-check ranges, not promises — vendor deflection numbers often don't hold on a real messy queue.</small></p>
+    </section>
+
+    <!-- Module 2 -->
+    <section>
+      <span class="module-tag">Module 2 · 10:15–11:30</span>
+      <h2>Tokens & context window</h2>
+      <p>A token ≈ ¾ of an English word.</p>
+      <p class="fragment">Gemini 2.5 Flash free tier: <strong>1M-token window</strong> (~750,000 words) — plenty for a pasted knowledge file plus a ticket.</p>
+    </section>
+
+    <section>
+      <span class="module-tag">Module 2</span>
+      <h2>Hallucination</h2>
+      <p>Fluent, confident, <span class="fail">wrong</span> text when the model isn't given the facts and is asked something requiring them.</p>
+      <p class="fragment">It doesn't "know" it's guessing.</p>
+      <p class="fragment">The fix: <strong>grounding</strong> — give it the source text, and instruct it to only use that.</p>
+    </section>
+
+    <section>
+      <span class="module-tag">Module 2</span>
+      <h2>Anatomy of a support-reply prompt</h2>
+      <ol class="step-list">
+        <li class="fragment"><strong>Role</strong> — who the model is acting as</li>
+        <li class="fragment"><strong>Rules/constraints</strong> — hard boundaries</li>
+        <li class="fragment"><strong>Reference facts</strong> — the grounding</li>
+        <li class="fragment"><strong>The input</strong> — the ticket itself</li>
+        <li class="fragment"><strong>Output format</strong> — plain text or structured JSON</li>
+      </ol>
+    </section>
+
+    <section>
+      <span class="module-tag">Lab 1.0 · Prompt-tuning sprint</span>
+      <h2>Setup (5 min)</h2>
+      <ul class="step-list">
+        <li>console.groq.com → Playground</li>
+        <li>Model: <code>openai/gpt-oss-120b</code></li>
+        <li>Confirm you can send a message and get a response</li>
+      </ul>
+      <p><small>Round 1: naive prompt (10 min) · Round 2: pair up and break each other's prompts (15 min) · Round 3: group diagnosis (15 min)</small></p>
+    </section>
+
+    <!-- Auto-Animate: naive -> improved prompt -->
+    <section data-auto-animate>
+      <span class="module-tag">Lab 1.0 · Worked example</span>
+      <h2 data-id="demo-title">Watch hallucination happen live</h2>
+      <p data-id="demo-label">Naive prompt:</p>
+      <div class="code-box" data-id="demo-prompt">Reply to this customer complaint politely.</div>
+      <div class="output-box bad fragment" data-id="demo-output">
+        <span class="fail"><strong>Fails:</strong></span> "I've issued a full refund of $[amount]..."<br>
+        — invents a refund amount and a policy decision no one made, ignores the tracking complaint.
+      </div>
+    </section>
+
+    <section data-auto-animate>
+      <span class="module-tag">Lab 1.0 · Worked example</span>
+      <h2 data-id="demo-title">Fix it: grounding</h2>
+      <p data-id="demo-label">Improved prompt — rules + reference facts:</p>
+      <div class="code-box" data-id="demo-prompt">Rules:
+- Only state facts present in the ticket or policy notes
+- Do NOT promise a refund amount
+- Acknowledge the specific complaint
+- Tone: warm, concise, max 120 words
+
+Policy notes:
+- Orders >5 days late qualify for refund review, not automatic refund
+- Tracking issues get escalated to logistics within 1 business day</div>
+      <div class="output-box good fragment" data-id="demo-output">
+        <span class="fix"><strong>Result:</strong></span> acknowledges both issues, states refund <em>review</em> (not a promised amount), commits to logistics escalation.<br>
+        <strong>No invented facts.</strong>
+      </div>
+    </section>
+
+    <!-- Module 3 -->
+    <section>
+      <span class="module-tag">Module 3 · 11:45–13:00</span>
+      <h2>NotebookLM deep dive</h2>
+      <p>Every source is chunked and indexed. Every answer <strong>cites</strong> the passage it drew from.</p>
+      <p class="fragment">Click a citation → source viewer highlights the exact sentence.</p>
+      <p class="fragment"><small>This is why it's a good teaching tool for grounding — participants can verify, not just trust.</small></p>
+    </section>
+
+    <section>
+      <span class="module-tag">Module 3</span>
+      <h2>Input vs. output</h2>
+      <table>
+        <tr><th>Input</th><th>Output</th></tr>
+        <tr><td>PDFs, Docs/Slides, plain text</td><td>Cited Q&amp;A chat answers</td></tr>
+        <tr><td>Website URLs, YouTube links</td><td>Notebook guide / summary</td></tr>
+        <tr><td>Audio files</td><td>FAQ, study guide, timeline docs</td></tr>
+        <tr><td>Up to 50 sources/notebook (free)</td><td>Audio Overview (podcast-style)</td></tr>
+      </table>
+      <p class="fragment warn"><small><strong>No API, no export button.</strong> Every output is copied by hand.</small></p>
+    </section>
+
+    <section>
+      <span class="module-tag">Lab 1.1</span>
+      <h2>Build your first knowledge notebook</h2>
+      <ul class="step-list">
+        <li>New notebook → Add source (PDF + Website, two sources)</li>
+        <li>Ask: "What are the main sections of this document?" — check citation chips</li>
+        <li>Click a citation → confirm it highlights the exact passage</li>
+        <li>Ask 4 more support-style questions, verify every citation</li>
+        <li>Studio panel → generate <strong>FAQ</strong> and <strong>Study guide</strong></li>
+      </ul>
+    </section>
+
+    <!-- Module 4 -->
+    <section>
+      <span class="module-tag">Module 4 · 14:00–16:30</span>
+      <h2>Retrieval-quality issues</h2>
+      <p class="fragment"><strong>Source granularity</strong> — one giant PDF with no headings retrieves worse than the same content split into sections.</p>
+      <p class="fragment"><strong>Contradictions across sources</strong> — NotebookLM cites both; it's on you to spot the conflict.</p>
+      <p class="fragment warn"><small>Real production failure modes, not just lab exercises.</small></p>
+    </section>
+
+    <section>
+      <span class="module-tag">Lab 1.2</span>
+      <h2>Draft real ticket replies, export by hand</h2>
+      <ul class="step-list">
+        <li>Pick 5 sample tickets, draft replies using only notebook sources</li>
+        <li>Check every claim against a citation → hallucination baseline</li>
+        <li>Create <code>knowledge-context.md</code></li>
+        <li>Copy Study Guide + FAQ into it under two headers</li>
+        <li>Trim anything sensitive — this gets pasted into a 3rd-party API on Day 3</li>
+      </ul>
+      <p class="fragment"><strong>Deliverable:</strong> <code>knowledge-context.md</code>, carried into Day 3</p>
+    </section>
+
+    <!-- ============ DAY 2 DIVIDER ============ -->
+    <section class="center day-divider">
+      <span class="day-label">Day 2</span>
+      <h1>Automating tickets<br>with n8n</h1>
+      <p>Zero to a working, AI-augmented ticket pipeline: intake, classification, drafted replies.</p>
+    </section>
+
+    <!-- Module 5 -->
+    <section>
+      <span class="module-tag">Module 5 · 09:00–10:15</span>
+      <h2>n8n fundamentals</h2>
+      <p>Workflows are directed graphs of <strong>nodes</strong>. A <strong>trigger node</strong> always starts it.</p>
+      <p class="fragment">Data between nodes is JSON — reference it with <code>{{ $json.subject }}</code></p>
+      <p class="fragment"><strong>Test step</strong> to debug one node; <strong>Active</strong> toggle to go live.</p>
+    </section>
+
+    <section>
+      <span class="module-tag">Module 5</span>
+      <h2>Bring up the stack</h2>
+      <div class="code-box">docker compose up -d
+docker compose exec tailscale tailscale funnel 5678
+# note the *.ts.net hostname → set WEBHOOK_URL in .env
+docker compose up -d</div>
+      <p><small>Two-step bootstrap, one time only — hostname stays stable after that.</small></p>
+    </section>
+
+    <!-- Module 6 -->
+    <section>
+      <span class="module-tag">Module 6 · 10:30–12:00</span>
+      <h2>Channels in &amp; out</h2>
+      <p>Generic <strong>Webhook</strong> (any system that POSTs JSON) and <strong>Telegram</strong> (real chat channel).</p>
+      <p class="fragment">Both need the Tailscale tunnel — Telegram's servers can't reach <code>localhost</code>.</p>
+      <p class="fragment warn"><small>Stuck on networking? Use <strong>Chat Trigger</strong> or <strong>Form Trigger</strong> instead — both local, no tunnel needed.</small></p>
+    </section>
+
+    <section>
+      <span class="module-tag">Lab 2.1 · Part A/B</span>
+      <h2>Webhook &amp; Telegram intake</h2>
+      <ul class="step-list">
+        <li><strong>A:</strong> Webhook node → curl a test ticket → confirm JSON in output</li>
+        <li><strong>A:</strong> Add Google Sheets Append Row → confirm new row</li>
+        <li><strong>B:</strong> @BotFather → new bot → copy token</li>
+        <li><strong>B:</strong> Telegram Trigger node → send a message → check execution</li>
+      </ul>
+    </section>
+
+    <section>
+      <span class="module-tag">Lab 2.1 · Part C/D</span>
+      <h2>Chat &amp; Form intake (no tunnel)</h2>
+      <ul class="step-list">
+        <li><strong>C:</strong> Chat Trigger — "When chat message received" — local chat widget, <code>$json.chatInput</code></li>
+        <li><strong>D:</strong> Form Trigger — Subject/Body/Email fields — no parsing needed, fields land top-level</li>
+      </ul>
+      <p class="fragment"><small>Whichever channel: same <code>subject</code>/<code>body</code> shape feeds Module 7.</small></p>
+    </section>
+
+    <section>
+      <span class="module-tag">Module 6 · Storage</span>
+      <h2>Sheets, CSV, or local Postgres</h2>
+      <table>
+        <tr><th>Option</th><th>Tradeoff</th></tr>
+        <tr><td>Google Sheets <em>(default)</em></td><td>Realistic, needs OAuth</td></tr>
+        <tr><td>CSV (Read/Write File)</td><td>Simplest, no extra container</td></tr>
+        <tr><td>Local Postgres + Adminer</td><td>Real DB, credential-free, <code>--profile local-db</code></td></tr>
+      </table>
+    </section>
+
+    <!-- Module 7 -->
+    <section>
+      <span class="module-tag">Module 7 · 13:00–14:30</span>
+      <h2>Calling an LLM from n8n</h2>
+      <p>Raw <strong>HTTP Request</strong> node over a purpose-built one — teaches the actual request/response contract.</p>
+      <div class="code-box">curl "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=$GEMINI_API_KEY" \
+  -d '{"contents":[{"parts":[{"text":"..."}]}]}'</div>
+      <p><small>Response text: <code>candidates[0].content.parts[0].text</code></small></p>
+    </section>
+
+    <section>
+      <span class="module-tag">Lab 2.2 · Classify &amp; score</span>
+      <h2>Pipeline</h2>
+      <ol class="step-list">
+        <li>Manual Trigger → Set (sample ticket) → HTTP Request (classify prompt)</li>
+        <li>Code node: parse JSON string → real fields</li>
+        <li>Switch on <code>category</code> (billing/technical/general)</li>
+        <li>IF: <code>urgency == high AND sentiment == negative</code> → needs-review branch</li>
+      </ol>
+    </section>
+
+    <!-- Module 8 -->
+    <section>
+      <span class="module-tag">Module 8 · 14:45–16:30</span>
+      <h2>Drafting replies automatically</h2>
+      <p>Same HTTP Request pattern — but drafts a reply and <strong>writes it to a place a human checks first.</strong></p>
+      <p class="fragment"><small>"Draft → hold for review" keeps Day 2 in agent-assist territory before Day 3 adds auto-send.</small></p>
+    </section>
+
+    <section>
+      <span class="module-tag">Lab 2.3 · Draft-and-hold</span>
+      <h2>Review-queue record</h2>
+      <ul class="step-list">
+        <li>Drafting HTTP Request → reply + confidence note (HIGH/MEDIUM/LOW)</li>
+        <li>Set node: <code>ticket_subject, category, sentiment, urgency, draft_reply, status="pending review"</code></li>
+        <li>Write to Sheets/Telegram/CSV/Postgres — this is your review queue</li>
+        <li>Approval is manual for this lab — a human flips the status</li>
+      </ul>
+      <p class="fragment"><strong>Deliverable:</strong> working classify → draft → hold-for-review workflow</p>
+    </section>
+
+    <!-- ============ DAY 3 DIVIDER ============ -->
+    <section class="center day-divider">
+      <span class="day-label">Day 3</span>
+      <h1>Connecting the two,<br>and the capstone</h1>
+      <p>Feed Day 1's grounded knowledge into Day 2's automation, add real guardrails.</p>
+    </section>
+
+    <!-- Module 9 -->
+    <section>
+      <span class="module-tag">Module 9 · 09:00–10:30</span>
+      <h2>Grounding n8n replies</h2>
+      <p class="fragment"><strong>(a) Direct injection</strong> — paste <code>knowledge-context.md</code> into the prompt. Simple, what the lab does.</p>
+      <p class="fragment"><strong>(b) Vector retrieval</strong> — for a knowledge base too large to paste whole. Conceptual here; the natural next step.</p>
+    </section>
+
+    <section>
+      <span class="module-tag">Module 9 · Sizing check</span>
+      <h2>How many CSV/Sheet rows fit?</h2>
+      <p><code>max rows ≈ word budget ÷ words per row</code></p>
+      <table>
+        <tr><th>Row size</th><th>Reliable (~15K words)</th><th>Free-tier/min (~187.5K)</th></tr>
+        <tr><td>Short (FAQ)</td><td>~1,000 rows</td><td>~12,500 rows</td></tr>
+        <tr><td>Medium (ticket)</td><td>~375 rows</td><td>~4,700 rows</td></tr>
+        <tr><td>Long (full body)</td><td>~150 rows</td><td>~1,875 rows</td></tr>
+      </table>
+      <p class="fragment"><small>Clears the reliable column? Consider (b) vector retrieval instead.</small></p>
+    </section>
+
+    <section>
+      <span class="module-tag">Lab 3.0 · Inject the knowledge file</span>
+      <h2>Pipeline you're building today</h2>
+      <div class="code-box">Ticket in → Classify → Retrieve context → Draft reply → Confidence check → Send / Escalate</div>
+      <p><small>Load <code>knowledge-context.md</code>, paste it into the drafting prompt ahead of the ticket, re-run the 3 test tickets — check claims now trace to the reference material.</small></p>
+    </section>
+
+    <!-- Module 10 -->
+    <section>
+      <span class="module-tag">Module 10 · 10:45–12:00</span>
+      <h2>Guardrails &amp; escalation logic</h2>
+      <p>Model confidence alone is a <span class="fail">weak signal</span> — models are often confidently wrong.</p>
+      <p class="fragment">Pair it with <strong>deterministic checks</strong>: keyword tripwires for refunds, legal, safety, cancellation.</p>
+    </section>
+
+    <section>
+      <span class="module-tag">Lab 3.1 · Guardrail branch</span>
+      <h2>The OR condition</h2>
+      <div class="code-box">confidence != "HIGH"
+  OR body contains: refund, cancel, lawsuit, legal, chargeback</div>
+      <p class="fragment"><span class="fail">True</span> → escalate to review queue</p>
+      <p class="fragment"><span class="fix">False</span> → auto-approved (logged, not actually sent in the lab)</p>
+      <p class="fragment warn"><small>Test: high-confidence-but-flagged-keyword MUST still escalate — that's the point of the OR.</small></p>
+    </section>
+
+    <!-- Module 11 -->
+    <section>
+      <span class="module-tag">Module 11 · 13:00–14:00</span>
+      <h2>Metrics that matter</h2>
+      <ul class="step-list">
+        <li><strong>Deflection rate</strong> = auto-approved ÷ total</li>
+        <li><strong>Escalation rate</strong> — by category; &gt;80% signals a coverage gap, not "unautomatable"</li>
+        <li><strong>Time-to-first-response</strong> — ticket-in to draft-ready</li>
+        <li><strong>CSAT delta</strong> — needs weeks of real volume, not visible in 3 days</li>
+      </ul>
+    </section>
+
+    <section>
+      <span class="module-tag">Module 11 · Privacy</span>
+      <h2>Before any real rollout</h2>
+      <p>Strip or mask PII before it goes into any third-party API call.</p>
+      <p class="fragment warn">Gemini's free tier: prompts/responses may train Google's models.</p>
+      <p class="fragment">Production rollout → paid tier with a no-training-data agreement.</p>
+    </section>
+
+    <section>
+      <span class="module-tag">Module 11 · Rollout, phased</span>
+      <h2>Three phases</h2>
+      <ol class="step-list">
+        <li><strong>Shadow mode</strong> — AI drafts, human writes independently, compare only. Zero customer risk.</li>
+        <li><strong>Co-pilot mode</strong> — human reviews/edits before sending. Runs until numbers are trusted.</li>
+        <li><strong>Narrow auto-send</strong> — one low-risk category, tripwires reviewed by policy owner.</li>
+      </ol>
+    </section>
+
+    <!-- Capstone -->
+    <section class="center">
+      <h2>Capstone — Build your team's agent</h2>
+      <ul class="step-list">
+        <li>NotebookLM knowledge base for one real product/policy area</li>
+        <li>n8n: intake → classify → grounded draft → guardrail → send/escalate</li>
+        <li>One escalation rule specific to your own risk area</li>
+        <li>5-minute live demo + one-page rollout plan</li>
+      </ul>
+    </section>
+
+    <section class="center">
+      <h1>Questions?</h1>
+      <p><small>Full workshop doc, docker-compose.yml, and sample data in this repo.</small></p>
+    </section>
+
+  </div>
+</div>
+<script src="reveal-dist/reveal.js"></script>
+<script src="reveal-dist/plugin/menu/menu.js"></script>
+<script>
+  Reveal.initialize({
+    hash: true,
+    controls: true,
+    progress: true,
+    center: true,
+    transition: 'slide',
+    slideNumber: 'c/t',
+    plugins: [ RevealMenu() ],
+    menu: {
+      side: 'left',
+      numbers: true,
+      useTextContentForMissingTitles: true,
+      openButton: true,
+      openSlideNumber: false,
+      keyboard: true,
+      themes: false,
+      transitions: false,
+      loadIcons: false
+    }
+  });
+</script>
+</body>
+</html>

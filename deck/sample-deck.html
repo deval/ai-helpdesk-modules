@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>AI-Powered Helpdesk Workshop — Sample Deck</title>
+  <style>
+    body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; }
+    h1, h2, h3 { font-weight: 400; margin-bottom: 0; }
+    .remark-slide-content { font-size: 24px; padding: 1em 2em; }
+    .remark-slide-content h1 { font-size: 2.2em; color: #1a1a2e; }
+    .remark-slide-content h2 { font-size: 1.6em; color: #16213e; }
+    .title-slide h1 { font-size: 2.8em; color: #0f3460; }
+    .title-slide { text-align: center; }
+    table { border-collapse: collapse; width: 100%; font-size: 0.75em; }
+    th, td { border: 1px solid #ccc; padding: 6px 10px; text-align: left; }
+    th { background: #0f3460; color: white; }
+    .fail { color: #b91c1c; }
+    .fix { color: #15803d; }
+    .footnote { font-size: 0.6em; color: #888; position: absolute; bottom: 20px; }
+    .remark-code, .remark-inline-code { font-family: 'Consolas', 'Courier New', monospace; }
+  </style>
+</head>
+<body>
+<textarea id="source">
+
+class: center, middle, title-slide
+
+# AI-Powered Helpdesk & Customer Service Workshop
+
+### 3 days · ~6 hours/day · $0 cost — free tiers only
+
+.footnote[Sample deck — built with remark.js, runs fully offline]
+
+---
+
+## What is an LLM?
+
+A large language model is **not a database** — it doesn't "look up" answers.
+
+--
+
+It's a **statistical next-token predictor**: trained on huge amounts of text, it predicts the most likely next token given everything before it.
+
+--
+
+There is **no internal fact-checker** and no concept of "I don't know this."
+
+--
+
+An accurate answer and an invented one are produced by the **exact same mechanism**.
+
+> An LLM optimizes for *plausible*, not *true*.
+
+---
+
+## Three levels of AI in support
+
+| Level | What happens | Risk |
+|---|---|---|
+| **Ticket deflection** | Customer never reaches a human | Fails on account-specific state |
+| **Agent-assist** | AI drafts, human approves | Safest place to start |
+| **Full automation** | AI acts with no human step | Reserve for narrow, high-confidence cases only |
+
+--
+
+Most of this workshop's pipeline lives in **agent-assist**: the "draft → hold for review" pattern.
+
+---
+
+## Watch hallucination happen live
+
+**Naive prompt:**
+
+```
+Reply to this customer complaint politely.
+```
+
+--
+
+.fail[**Typical output (fails):**] "I've issued a full refund of $[amount]..."
+
+— invents a refund amount and a policy decision **no one made**.
+
+---
+
+## Fix it: grounding
+
+**Improved prompt** — adds rules + reference facts:
+
+```
+Rules:
+- Only state facts present in the ticket or policy notes
+- Do NOT promise a refund amount
+- Acknowledge the specific complaint
+```
+
+--
+
+.fix[**Resulting output:**] acknowledges the issue, states it qualifies for *review* — not a promised amount. **No invented facts.**
+
+---
+
+## Tool stack (all free)
+
+| Tool | Role |
+|---|---|
+| Google NotebookLM | Source-grounded Q&A, knowledge base |
+| n8n + Tailscale Funnel | Self-hosted automation, stable public URL |
+| Groq API | Fast live prompt-tuning demo |
+| Gemini API | Classify + draft replies inside n8n |
+
+---
+
+class: center, middle
+
+# Questions?
+
+.footnote[This is a 6-slide sample — the full deck would cover all 3 days / 11 modules]
+
+</textarea>
+<script src="remark.min.js"></script>
+<script>
+  var slideshow = remark.create({
+    highlightStyle: 'github',
+    highlightLines: true,
+    countIncrementalSlides: false
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,60 @@
+services:
+  tailscale:
+    image: tailscale/tailscale:latest
+    hostname: ${TS_HOSTNAME:-helpdesk-workshop}
+    environment:
+      - TS_AUTHKEY=${TS_AUTHKEY}
+      - TS_STATE_DIR=/var/lib/tailscale
+    volumes:
+      - tailscale_state:/var/lib/tailscale
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+    ports:
+      - "5678:5678"
+      - "8080:8080" # Adminer, only reachable when --profile local-db is used
+    restart: unless-stopped
+
+  n8n:
+    image: n8nio/n8n
+    network_mode: "service:tailscale"
+    environment:
+      - N8N_HOST=0.0.0.0
+      - N8N_PROTOCOL=https
+      - WEBHOOK_URL=${WEBHOOK_URL}
+      - N8N_EDITOR_BASE_URL=${WEBHOOK_URL}
+    volumes:
+      - n8n_data:/home/node/.n8n
+    depends_on:
+      - tailscale
+
+  # Optional: local Postgres, for participants who want a credential-free
+  # alternative to Google Sheets for the review-queue/logging steps.
+  # Not started by default — run `docker compose --profile local-db up` to include it.
+  postgres:
+    image: postgres:16
+    profiles: ["local-db"]
+    environment:
+      - POSTGRES_USER=n8n
+      - POSTGRES_PASSWORD=n8n
+      - POSTGRES_DB=helpdesk
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    network_mode: "service:tailscale"
+    depends_on:
+      - tailscale
+
+  # Optional: lightweight web UI to browse the Postgres tables during the
+  # workshop, since a raw SQL table is harder for a human reviewer to
+  # eyeball than a spreadsheet. Same --profile local-db as above.
+  adminer:
+    image: adminer:latest
+    profiles: ["local-db"]
+    network_mode: "service:tailscale"
+    depends_on:
+      - postgres
+
+volumes:
+  tailscale_state:
+  n8n_data:
+  postgres_data:

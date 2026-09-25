@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>AI-Powered Helpdesk Workshop — Sample Deck (reveal.js)</title>
+  <link rel="stylesheet" href="reveal-dist/reveal.css">
+  <link rel="stylesheet" href="reveal-dist/theme/black.css">
+  <style>
+    :root {
+      --navy-bg: #0b1229;
+      --navy-bg-alt: #121b3d;
+      --maroon: #8c2f39;
+      --maroon-bright: #b8394a;
+      --ink: #e8e6df;
+      --ink-dim: #a9a7b5;
+    }
+    .reveal { background: var(--navy-bg); }
+    .reveal .slides section { text-align: center; }
+    .reveal h1, .reveal h2, .reveal h3 {
+      color: var(--maroon-bright);
+      text-shadow: none;
+    }
+    .reveal p, .reveal li { color: var(--ink); }
+    .reveal small, .reveal p small { color: var(--ink-dim); }
+    .reveal em { color: #d4a5ac; }
+    .reveal strong { color: #f2c9ce; }
+    .reveal ::selection { background: var(--maroon); color: #fff; }
+    .reveal .progress { color: var(--maroon-bright); }
+    .reveal .controls { color: var(--maroon-bright); }
+
+    .reveal table { font-size: 0.65em; border-collapse: collapse; }
+    .reveal table th {
+      background: var(--maroon); color: #fff; border-color: #3a2530;
+    }
+    .reveal table td { color: var(--ink); border-color: #2a3358; }
+    .reveal table tr { background: var(--navy-bg-alt); }
+
+    .fail { color: #f87171; }
+    .fix { color: #4ade80; }
+    .prompt-box {
+      background: #060a17; color: #cbd5e1; text-align: left;
+      padding: 20px; border-radius: 8px; font-size: 0.5em;
+      font-family: 'Consolas', 'Courier New', monospace; margin: 20px auto;
+      max-width: 700px; white-space: pre-wrap;
+      border: 1px solid var(--maroon);
+    }
+    .output-box {
+      text-align: left; padding: 16px 20px; border-radius: 8px;
+      font-size: 0.55em; margin: 20px auto; max-width: 700px;
+      border-left: 6px solid #666; background: var(--navy-bg-alt);
+    }
+    .output-box.bad { border-left-color: #f87171; }
+    .output-box.bad, .output-box.bad * { color: #fca5a5; }
+    .output-box.good { border-left-color: #4ade80; }
+    .output-box.good, .output-box.good * { color: #86efac; }
+  </style>
+</head>
+<body>
+<div class="reveal">
+  <div class="slides">
+
+    <section>
+      <h1>AI-Powered Helpdesk<br>& Customer Service Workshop</h1>
+      <h3>3 days · ~6 hours/day · $0 cost — free tiers only</h3>
+      <p><small>Sample deck — built with reveal.js, runs fully offline</small></p>
+    </section>
+
+    <section>
+      <h2>What is an LLM?</h2>
+      <p class="fragment">A large language model is <strong>not a database</strong> — it doesn't "look up" answers.</p>
+      <p class="fragment">It's a <strong>statistical next-token predictor</strong>: trained on huge amounts of text, predicting the most likely next token given everything before it.</p>
+      <p class="fragment">There is <strong>no internal fact-checker</strong> and no concept of "I don't know this."</p>
+      <p class="fragment"><em>An LLM optimizes for plausible, not true.</em></p>
+    </section>
+
+    <section>
+      <h2>Three levels of AI in support</h2>
+      <table>
+        <tr><th>Level</th><th>What happens</th><th>Risk</th></tr>
+        <tr class="fragment"><td><strong>Ticket deflection</strong></td><td>Customer never reaches a human</td><td>Fails on account-specific state</td></tr>
+        <tr class="fragment"><td><strong>Agent-assist</strong></td><td>AI drafts, human approves</td><td>Safest place to start</td></tr>
+        <tr class="fragment"><td><strong>Full automation</strong></td><td>AI acts with no human step</td><td>Narrow, high-confidence cases only</td></tr>
+      </table>
+      <p class="fragment"><small>Most of this workshop's pipeline lives in <strong>agent-assist</strong>.</small></p>
+    </section>
+
+    <!-- Auto-Animate pair: naive prompt -> improved prompt -->
+    <section data-auto-animate>
+      <h2 data-id="demo-title">Watch hallucination happen live</h2>
+      <p data-id="demo-label">Naive prompt:</p>
+      <div class="prompt-box" data-id="demo-prompt">Reply to this customer complaint politely.</div>
+      <div class="output-box bad fragment" data-id="demo-output">
+        <span class="fail"><strong>Fails:</strong></span> "I've issued a full refund of $[amount]..."<br>
+        — invents a refund amount and a policy decision no one made.
+      </div>
+    </section>
+
+    <section data-auto-animate>
+      <h2 data-id="demo-title">Fix it: grounding</h2>
+      <p data-id="demo-label">Improved prompt — adds rules + reference facts:</p>
+      <div class="prompt-box" data-id="demo-prompt">Rules:
+- Only state facts present in the ticket or policy notes
+- Do NOT promise a refund amount
+- Acknowledge the specific complaint</div>
+      <div class="output-box good fragment" data-id="demo-output">
+        <span class="fix"><strong>Result:</strong></span> acknowledges the issue, states it qualifies for review — not a promised amount.<br>
+        <strong>No invented facts.</strong>
+      </div>
+    </section>
+
+    <section>
+      <h2>Tool stack (all free)</h2>
+      <table>
+        <tr><th>Tool</th><th>Role</th></tr>
+        <tr><td>Google NotebookLM</td><td>Source-grounded Q&amp;A, knowledge base</td></tr>
+        <tr><td>n8n + Tailscale Funnel</td><td>Self-hosted automation, stable public URL</td></tr>
+        <tr><td>Groq API</td><td>Fast live prompt-tuning demo</td></tr>
+        <tr><td>Gemini API</td><td>Classify + draft replies inside n8n</td></tr>
+      </table>
+    </section>
+
+    <section>
+      <h1>Questions?</h1>
+      <p><small>This is a 7-slide sample — the full deck would cover all 3 days / 11 modules</small></p>
+    </section>
+
+  </div>
+</div>
+<script src="reveal-dist/reveal.js"></script>
+<script>
+  Reveal.initialize({
+    hash: true,
+    controls: true,
+    progress: true,
+    center: true,
+    transition: 'slide'
+  });
+</script>
+</body>
+</html>
