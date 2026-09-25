@@ -12,7 +12,7 @@
 | Tool | Notes |
 |---|---|
 | **Google NotebookLM** | `notebooklm.google.com` — free Google account. Source-grounded Q&A, summaries, FAQ & audio generation from your own docs. |
-| **n8n + Tailscale Funnel** | n8n self-hosted via a single `docker-compose.yml` (see below); free for this internal/self-hosted use. Tailscale Funnel provides a **stable** public webhook URL (`device.tailnet.ts.net`) — free, no domain purchase needed, no session time cap. |
+| **n8n** | Self-hosted via a single `docker-compose.yml` (see below); free for this internal/self-hosted use. Runs entirely on `localhost:5678` — no tunnel needed for anything in this workshop except the optional Telegram stretch goal (see Module 6). |
 | **Groq API / Console** | Free-tier key, no credit card. Used for Day 1's live prompt-tuning sprint — near-instant responses (LPU hardware) matter for a live, rapid iterate-and-break exercise. |
 | **Gemini API** | Free-tier key, no credit card. Used for Day 2/3's n8n AI nodes — same model family as NotebookLM (reinforces the grounding discussion), and its 1M-token context comfortably holds a pasted knowledge-context file plus a ticket. |
 | **Sample data** | Two official documents from the same Indonesian government body — **Direktorat Jenderal Pajak (DJP)** — covering its 2025 Coretax system: the *Panduan Ringkas Coretax* PDF guide and the official *FAQ Coretax* web page. Synthetic support tickets, authored for the course, reference both. |
@@ -22,7 +22,7 @@
 
 | Tool | Status | Notes |
 |---|---|---|
-| **Tailscale Funnel** (replaces ngrok) | Free, stable, chosen for this workshop | ngrok's free tier was cut hard in Feb 2026 (custom static domains moved to paid plans, free sessions capped at 2 hours) — unworkable for a 6-hour tunnel-up-all-day workshop. Switched to **Tailscale Funnel**: free for personal/small-team use, gives a stable `device.tailnet.ts.net` hostname with a real cert, no domain purchase, no session cap, one command to expose a port. Participants who later want a branded custom domain can add one themselves on a paid Tailscale/Cloudflare/ngrok plan — not needed for the workshop itself. |
+| **No tunnel needed** (ngrok/Tailscale removed) | Simplified 2026-09-25 | Earlier versions of this doc used ngrok, then Tailscale Funnel, to expose n8n publicly for a live Telegram bot demo. Since only Telegram actually needs a public URL — everything else in the workshop (Chat Trigger, Form Trigger, all LLM calls) works entirely on `localhost` — the tunnel was removed from the default setup. Telegram is now an optional stretch goal (Module 6) where a participant who wants it brings their own tunnel (ngrok, Tailscale Funnel, Cloudflare Tunnel, etc.) — not required for the core workshop path. |
 | **NotebookLM** | **Renamed, mostly fine** | Restructured into Google's AI subscription bundle in May 2026 and renamed **Gemini Notebook** on 2026-07-16 — the UI/branding participants see may say "Gemini Notebook," not "NotebookLM." Free tier itself is still usable: 50 sources/notebook, 100 notebooks, 50 chats/day. New as of 2026-09-02: a rolling compute quota that refreshes every 5 hours up to a weekly cap — worth knowing if a full room hammers it back-to-back during Lab 1.1/1.2, since that's a new failure mode not in the doc's existing Gemini-API caveat. |
 | **Groq** | Free, as documented | Free tier confirmed still live with no credit card: ~30 RPM / 1K req/day / 8K TPM / 200K TPD on `openai/gpt-oss-120b` (updated model — see the model table below; the doc's original pick, `llama-3.3-70b-versatile`, is dead). |
 | **Gemini API** | Free, with the caveat already in Module 11 | Confirmed: free-tier prompts/responses can be used to train Google's models; paid tier is excluded from training. The existing privacy checklist in Module 11 already tells participants to keep real customer data off the free tier — that's correct and sufficient, no change needed. |
@@ -43,7 +43,7 @@
 
 **Hardware & access:**
 - A laptop with **admin/install rights** — Docker Desktop's installer needs them, and IT-locked corporate laptops are the single most common no-show cause for workshops like this. Confirm this explicitly in the setup email, don't assume.
-- At least **10GB free disk space** (Docker images for n8n + Tailscale, plus pulled layers, add up) and a stable internet connection — the first `docker compose up` pulls several hundred MB.
+- At least **5GB free disk space** (the n8n Docker image plus pulled layers) and a stable internet connection — the first `docker compose up` pulls several hundred MB.
 - Check your organization's size against Docker Desktop's free-use threshold (**under 250 employees and under $10M revenue** — see the licensing table above). If your org doesn't qualify, either arrange paid Docker seats ahead of time or substitute Docker Engine/Colima/Podman, which aren't subject to the same license.
 
 **Skills assumed:**
@@ -56,31 +56,21 @@
 2. Create/confirm a **Google account** with NotebookLM (now branded **Gemini Notebook**) access — sign in at notebooklm.google.com, confirm you can create a notebook.
 3. Create a **Groq account** at console.groq.com → **API Keys** → **Create API Key** → copy and store it.
 4. Create a **Google AI Studio** key at aistudio.google.com/apikey → **Create API key** → copy and store it. (This is the Gemini API key.)
-5. Create a free **Tailscale account** at tailscale.com (sign in with Google/GitHub/email — no domain or credit card needed) and install the Tailscale client. Confirm you can see your device's `*.ts.net` hostname in the admin console — that's your stable tunnel address for Day 2.
-6. In the Tailscale admin console, under **Settings → Funnel**, confirm Funnel is enabled for your account (it's on by default for personal accounts, but some managed/work tailnets restrict it — check ahead if you're using a work account).
-7. A setup-check email goes out 3 days prior confirming all accounts/keys are working, **and explicitly asking participants to confirm they have laptop admin rights** — this is worth its own line item, not just a keys check.
+5. A setup-check email goes out 3 days prior confirming all accounts/keys are working, **and explicitly asking participants to confirm they have laptop admin rights** — this is worth its own line item, not just a keys check.
 
-### `docker-compose.yml` — starts n8n, exposed via Tailscale Funnel on a fixed URL
+*(No tunnel account needed — see Module 6 if you want to do the optional Telegram stretch goal, which requires bringing your own.)*
 
-See [`docker-compose.yml`](docker-compose.yml) in this directory. n8n runs in a container that shares its network with a `tailscale` sidecar container; the sidecar joins your tailnet and, once Funnel is turned on, exposes port 5678 publicly. The resulting hostname (`your-device-name.your-tailnet.ts.net`) never changes between restarts — without that stability, Telegram's webhook registration would break every time the tunnel restarts, which is exactly the kind of flakiness you don't want mid-workshop. No session time cap, so it stays up for the full 6-hour day.
+### `docker-compose.yml` — starts n8n, local only
 
-**This is a two-step bootstrap** (your `*.ts.net` hostname isn't known until Tailscale assigns it, so you can't put it in `.env` before the first run):
+See [`docker-compose.yml`](docker-compose.yml) in this directory. One service, no tunnel, no bootstrap:
 
-1. Create a `.env` file next to `docker-compose.yml`:
-   ```
-   TS_AUTHKEY=your_tailscale_authkey_here
-   TS_HOSTNAME=yourname-helpdesk
-   WEBHOOK_URL=
-   ```
-   (Generate a reusable, non-ephemeral auth key in the Tailscale admin console under **Settings → Keys → Generate auth key** — check "Reusable" on and "Ephemeral" off so the device persists across `docker compose` restarts.)
-2. Run `docker compose up -d`, then enable Funnel on the sidecar:
-   ```bash
-   docker compose exec tailscale tailscale funnel 5678
-   ```
-3. Look up the full hostname it printed (or check the Tailscale admin console's **Machines** list — that's your equivalent of ngrok's old inspector for confirming the tunnel is live), set `WEBHOOK_URL=https://yourname-helpdesk.your-tailnet.ts.net/` in `.env`, and run `docker compose up -d` again to pick it up.
-4. From then on, `docker compose up` alone is enough — the hostname is stable across restarts, so this bootstrap is a one-time step per participant.
+```bash
+docker compose up -d
+```
 
-Open `http://localhost:5678` to reach the n8n editor directly (it's still reachable locally through the shared network namespace).
+Open `http://localhost:5678` to reach the n8n editor. On first load, n8n asks you to create an owner account (any local email/password — this stays on your machine). That's the entire setup for the core workshop path — Chat Trigger and Form Trigger (Lab 2.1, Parts C/D) both work over `localhost`, and every LLM call (Groq, Gemini) is outbound, so nothing here needs a public URL.
+
+If you want the optional Telegram stretch goal (Module 6, Part B), you'll need to expose port 5678 publicly yourself — any tunnel tool works (ngrok, Tailscale Funnel, Cloudflare Tunnel). That's a bring-your-own-tool step now, not something this compose file sets up for you.
 
 ---
 
@@ -251,29 +241,27 @@ n8n workflows are directed graphs of **nodes**. A **trigger node** (diamond-shap
 
 #### Setup — bring up the stack
 
-1. If you haven't already completed the two-step Tailscale bootstrap described in the `docker-compose.yml` section above (Prerequisites), do that now — confirm `.env` has `TS_AUTHKEY`, `TS_HOSTNAME`, and a populated `WEBHOOK_URL` before continuing.
-2. Run:
+1. Run:
    ```bash
    docker compose up
    ```
-3. Open `http://localhost:5678`. On first load, n8n asks you to create an owner account (any local email/password — this stays on your machine).
-4. In the Tailscale admin console's **Machines** list, click your workshop container and confirm **Funnel** shows as enabled with your `*.ts.net` hostname — that's your public webhook URL for the rest of the day.
+2. Open `http://localhost:5678`. On first load, n8n asks you to create an owner account (any local email/password — this stays on your machine).
+
+That's it — no tunnel, no bootstrap. (If you're doing the optional Telegram stretch goal in Module 6, set up your own tunnel tool before that point; not needed for anything else today.)
 
 ### Module 6 · Channels in & out (10:30–12:00)
 
-Two intake channels for the course: a generic **Webhook** trigger (any system that can POST JSON — this is the universal integration point for a real helpdesk platform like Zendesk or Freshdesk) and a **Telegram** trigger (a real chat channel, closest to a live support inbox, and fun to demo live).
+Two default intake channels for the course, both served directly by n8n on `localhost:5678` — no tunnel, no external account: a generic **Webhook** trigger (any system that can POST JSON — this is the universal integration point for a real helpdesk platform like Zendesk or Freshdesk, demoed here with a local `curl`) and n8n's built-in **Chat Trigger** and **Form Trigger** (a real-time chat widget and a submission form, both good stand-ins for "a live support channel" without any networking setup).
 
-Both are webhook-based under the hood: n8n exposes a URL, and the external system (Telegram's servers, or whatever you configure to call in) POSTs to it. That's why both need the Tailscale Funnel tunnel — Telegram's servers can't reach `localhost`.
-
-> **If Tailscale Funnel setup is giving someone trouble:** Lab 2.1 has two more parts below (C and D) that use n8n's built-in **Chat Trigger** and **Form Trigger** nodes instead. Both are served directly by n8n at `localhost:5678` — no tunnel, no external account, no public URL at all. A participant stuck on networking can do Part C or D instead of Part B and still have a working intake channel to carry into Module 7/8; they can circle back to Telegram later if time allows.
+> **Optional stretch goal — Telegram.** Lab 2.1's Part B wires up a real Telegram bot instead of the local Chat/Form Trigger. Telegram's servers need to reach n8n from the public internet, which means you'll need to expose port 5678 yourself first — any tunnel tool works (ngrok, Tailscale Funnel, Cloudflare Tunnel). This is intentionally left as a bring-your-own-tool step rather than baked into `docker-compose.yml`, since it's the only thing in the whole workshop that needs a public URL at all. Skip it if you'd rather not deal with tunnel setup — Chat/Form Trigger cover the same "live channel" teaching point for Module 7/8 onward.
 
 > **Storage — default is Google Sheets, with two credential-free local alternatives.** Every "Add a Google Sheets node, Append Row" step in this workshop (Lab 2.1's four parts, Lab 2.3, Lab 3.1) can be swapped for one of these if a participant would rather not do the Google OAuth flow, or wants a more realistic backend:
 > - **CSV file** — a **Read/Write File** node (operation: Write, with **Append** turned on) writing to a local path like `/home/node/.n8n-files/tickets.csv`. Simplest option, no extra container. One known rough edge: community reports of the Append toggle occasionally not flushing correctly on rapid back-to-back writes — fine for a workshop's pace of one ticket at a time, but don't rely on it for a real burst-traffic pipeline.
-> - **Local Postgres** — a real database, run via `docker compose --profile local-db up` (adds `postgres` + `adminer` containers to the stack — see `docker-compose.yml`). n8n's native **Postgres** node, operation **Insert**, connects with host `localhost`, port `5432`, db `helpdesk`, user/password `n8n`/`n8n` (all pre-set in the compose file, nothing to sign up for). Browse the table during the workshop at `http://localhost:8080` (Adminer) instead of eyeballing a spreadsheet.
+> - **Local Postgres** — a real database, run via `docker compose --profile local-db up` (adds `postgres` + `adminer` containers to the stack — see `docker-compose.yml`). n8n's native **Postgres** node, operation **Insert**, connects with host `postgres` (the container's service name — containers on the same compose network reach each other by name, not `localhost`), port `5432`, db `helpdesk`, user/password `n8n`/`n8n` (all pre-set in the compose file, nothing to sign up for). Browse the table during the workshop at `http://localhost:8080` (Adminer) instead of eyeballing a spreadsheet.
 >
 > Recommendation: keep Sheets as the taught default (it mirrors what most real support teams already use), but mention both alternatives up front so participants without a Google account, or who'd rather not do OAuth live, aren't blocked.
 
-#### Lab 2.1 — Ticket intake workflow (Webhook, Telegram, Chat, or Form)
+#### Lab 2.1 — Ticket intake workflow (Webhook, Chat, Form — plus optional Telegram)
 
 **Part A — generic webhook:**
 1. In n8n, click **+ Add workflow**.
@@ -290,10 +278,10 @@ Both are webhook-based under the hood: n8n exposes a URL, and the external syste
 7. Add a **Google Sheets** node (or **Airtable**) after the Webhook node. Connect a credential (OAuth for Sheets is fastest — n8n walks you through it). Set operation to **Append Row**, mapping `subject`, `body`, `customer_email` to columns.
 8. Run the curl command again and confirm a new row appears in your sheet.
 
-**Part B — Telegram:**
+**Part B — Telegram (optional stretch goal, needs your own tunnel — see the note above Lab 2.1):**
 9. In Telegram, message **@BotFather**. Send `/newbot`, follow the prompts (choose a display name, then a username ending in `bot`). Copy the API token it gives you.
 10. Back in n8n, add a **Telegram Trigger** node to a *new* workflow. Click **Create new credential**, paste the bot token, save.
-11. Set **Updates** to `message`. Save and **activate** the workflow (toggle top-right) — because `WEBHOOK_URL` is set to your `*.ts.net` Funnel hostname in `docker-compose.yml`, n8n automatically registers the correct public webhook with Telegram; there's no URL to copy by hand.
+11. Set **Updates** to `message`. Save and **activate** the workflow (toggle top-right). If your tunnel tool auto-populates `WEBHOOK_URL` for n8n (as Tailscale Funnel or ngrok can), n8n registers the public webhook with Telegram automatically; otherwise register it by hand via Telegram's `setWebhook` API pointed at your tunnel's URL.
 12. Open Telegram, find your bot by its username, and send it a message: *"My order #48213 hasn't arrived."*
 13. Back in n8n, click into the workflow's **Executions** list (left sidebar) and confirm your message arrived as a new execution, with the message text under `$json.message.text`.
 14. Add the same Google Sheets **Append Row** node as Part A, mapping `message.text` and `message.from.username` to your columns — now both channels log to the same place.
@@ -464,7 +452,7 @@ Working solo or in pairs, assemble the full pipeline end to end using your own (
 
 - Sample dataset (DJP Coretax PDF guide + DJP FAQ page + synthetic ticket set, see Sample Data section)
 - n8n workflow templates — exported JSON for each day's lab, ready to re-import
-- `docker-compose.yml` — starts n8n + Tailscale Funnel together on a fixed static URL
+- `docker-compose.yml` — starts n8n on `localhost:5678`, plus optional local Postgres/Adminer
 - Guardrail checklist — one-page confidence & escalation design worksheet
 
 ---
