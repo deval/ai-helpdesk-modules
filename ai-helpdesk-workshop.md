@@ -235,7 +235,7 @@ Because there's no automatic export (Module 3), turning NotebookLM's output into
 
 n8n workflows are directed graphs of **nodes**. A **trigger node** (diamond-shaped icon, always the first node) starts a workflow — on a webhook call, a schedule, or an incoming message. Every other node processes the data that flows through it. Data between nodes is always JSON; you reference a previous node's output using **expressions**, written as `{{ }}` — e.g. `{{ $json.subject }}` pulls the `subject` field from the current item.
 
-**Credentials** are stored once (Settings → Credentials, or inline when configuring a node) and reused across workflows — you'll create one for Telegram and one for the Gemini API today, and never re-paste the key again.
+**Credentials** are stored once (Settings → Credentials, or inline when configuring a node) and reused across workflows — you'll create one for the Gemini API today (and one for Telegram too, if you're doing that optional stretch goal), and never re-paste the key again.
 
 **Manual vs. production execution:** while building, you run a node with **"Test step"** or the whole workflow with **"Test workflow"** — this uses real data you provide and shows you the exact JSON at every step, which is the fastest way to debug an expression. A workflow only listens for *real* incoming webhooks/messages once you flip the **Active** toggle (top right) to on.
 
@@ -251,7 +251,7 @@ That's it — no tunnel, no bootstrap. (If you're doing the optional Telegram st
 
 ### Module 6 · Channels in & out (10:30–12:00)
 
-Two default intake channels for the course, both served directly by n8n on `localhost:5678` — no tunnel, no external account: a generic **Webhook** trigger (any system that can POST JSON — this is the universal integration point for a real helpdesk platform like Zendesk or Freshdesk, demoed here with a local `curl`) and n8n's built-in **Chat Trigger** and **Form Trigger** (a real-time chat widget and a submission form, both good stand-ins for "a live support channel" without any networking setup).
+Three default intake channels for the course, all served directly by n8n on `localhost:5678` — no tunnel, no external account: a generic **Webhook** trigger (any system that can POST JSON — this is the universal integration point for a real helpdesk platform like Zendesk or Freshdesk, demoed here with a local `curl`), and n8n's built-in **Chat Trigger** and **Form Trigger** (a real-time chat widget and a submission form, both good stand-ins for "a live support channel" without any networking setup).
 
 > **Optional stretch goal — Telegram.** Lab 2.1's Part B wires up a real Telegram bot instead of the local Chat/Form Trigger. Telegram's servers need to reach n8n from the public internet, which means you'll need to expose port 5678 yourself first — any tunnel tool works (ngrok, Tailscale Funnel, Cloudflare Tunnel). This is intentionally left as a bring-your-own-tool step rather than baked into `docker-compose.yml`, since it's the only thing in the whole workshop that needs a public URL at all. Skip it if you'd rather not deal with tunnel setup — Chat/Form Trigger cover the same "live channel" teaching point for Module 7/8 onward.
 
