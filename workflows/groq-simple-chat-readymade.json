@@ -1,0 +1,94 @@
+{
+  "name": "Groq Simple Chat with Knowledge Base (ready-made nodes)",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## Setup\n1. Get a free Groq API key: https://console.groq.com/keys\n2. Open the **Groq Chat Model** node and create a new **Groq API** credential with that key (click the credential dropdown → Create New).\n3. Open the **Knowledge Base** node and replace the placeholder text with your own markdown (FAQ, policy doc, whatever you want the bot grounded on).\n4. Click **Chat** at the bottom of the canvas to test.\n\nThis version uses n8n's ready-made LangChain nodes (Basic LLM Chain + Groq Chat Model) instead of a hand-built HTTP Request — no manual JSON body, headers, or response parsing. See workflows/groq-simple-chat.json for the hand-built version that shows what's happening under the hood.",
+        "height": 340,
+        "width": 400
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [-640, -200],
+      "id": "sticky-setup",
+      "name": "Setup Instructions"
+    },
+    {
+      "parameters": {
+        "public": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.1,
+      "position": [-640, 120],
+      "id": "chat-trigger",
+      "name": "When chat message received",
+      "webhookId": "groq-simple-chat-readymade"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "kb-field",
+              "name": "knowledge_context",
+              "value": "# Example Knowledge Base\n\nReplace this with your own markdown. Example content:\n\n## Refund policy\nRefunds are issued within 14 days of purchase if the product is unused. Contact billing@example.com with your order number.\n\n## Support hours\nSupport is available Monday-Friday, 09:00-17:00 WIB. Outside these hours, tickets are queued and answered the next business day.",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [-320, 120],
+      "id": "knowledge-base",
+      "name": "Knowledge Base"
+    },
+    {
+      "parameters": {
+        "promptType": "auto",
+        "messages": {
+          "messageValues": [
+            {
+              "type": "SystemMessagePromptTemplate",
+              "message": "=You are a helpful support assistant. Answer ONLY using the knowledge base below. If the answer isn't in the knowledge base, say you don't know and suggest contacting a human.\n\nKnowledge base:\n{{ $('Knowledge Base').item.json.knowledge_context }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.5,
+      "position": [-40, 120],
+      "id": "llm-chain",
+      "name": "Basic LLM Chain"
+    },
+    {
+      "parameters": {
+        "model": "llama-3.3-70b-versatile",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [-40, 320],
+      "id": "groq-model",
+      "name": "Groq Chat Model",
+      "credentials": {}
+    }
+  ],
+  "connections": {
+    "When chat message received": {
+      "main": [[{ "node": "Knowledge Base", "type": "main", "index": 0 }]]
+    },
+    "Knowledge Base": {
+      "main": [[{ "node": "Basic LLM Chain", "type": "main", "index": 0 }]]
+    },
+    "Groq Chat Model": {
+      "ai_languageModel": [[{ "node": "Basic LLM Chain", "type": "ai_languageModel", "index": 0 }]]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

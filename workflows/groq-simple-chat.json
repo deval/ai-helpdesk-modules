@@ -1,0 +1,111 @@
+{
+  "name": "Groq Simple Chat with Knowledge Base",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## Setup\n1. Get a free Groq API key: https://console.groq.com/keys\n2. Open the **Call Groq** node and paste your key into the `Authorization` header value, replacing `YOUR_GROQ_API_KEY_HERE`.\n3. Open the **Knowledge Base** node and replace the placeholder text with your own markdown (FAQ, policy doc, whatever you want the bot grounded on).\n4. Click **Chat** at the bottom of the canvas to test.\n\nNo vector store, no embeddings — the whole knowledge base is just pasted into the prompt every time (see Module 9, approach (a), in the workshop doc).",
+        "height": 320,
+        "width": 380
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [-640, -180],
+      "id": "sticky-setup",
+      "name": "Setup Instructions"
+    },
+    {
+      "parameters": {
+        "public": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.1,
+      "position": [-640, 120],
+      "id": "chat-trigger",
+      "name": "When chat message received",
+      "webhookId": "groq-simple-chat"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "kb-field",
+              "name": "knowledge_context",
+              "value": "# Example Knowledge Base\n\nReplace this with your own markdown. Example content:\n\n## Refund policy\nRefunds are issued within 14 days of purchase if the product is unused. Contact billing@example.com with your order number.\n\n## Support hours\nSupport is available Monday-Friday, 09:00-17:00 WIB. Outside these hours, tickets are queued and answered the next business day.",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [-320, 120],
+      "id": "knowledge-base",
+      "name": "Knowledge Base"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.groq.com/openai/v1/chat/completions",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer YOUR_GROQ_API_KEY_HERE"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({\n  model: \"llama-3.3-70b-versatile\",\n  messages: [\n    {\n      role: \"system\",\n      content: \"You are a helpful support assistant. Answer ONLY using the knowledge base below. If the answer isn't in the knowledge base, say you don't know and suggest contacting a human.\\n\\nKnowledge base:\\n\" + $('Knowledge Base').item.json.knowledge_context\n    },\n    {\n      role: \"user\",\n      content: $json.chatInput\n    }\n  ]\n}) }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [-40, 120],
+      "id": "call-groq",
+      "name": "Call Groq"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "output-field",
+              "name": "output",
+              "value": "={{ $json.choices[0].message.content }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [260, 120],
+      "id": "extract-reply",
+      "name": "Extract Reply"
+    }
+  ],
+  "connections": {
+    "When chat message received": {
+      "main": [[{ "node": "Knowledge Base", "type": "main", "index": 0 }]]
+    },
+    "Knowledge Base": {
+      "main": [[{ "node": "Call Groq", "type": "main", "index": 0 }]]
+    },
+    "Call Groq": {
+      "main": [[{ "node": "Extract Reply", "type": "main", "index": 0 }]]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}
